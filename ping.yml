@@ -1,4 +1,6 @@
- hosts: "{{ target_host }}"
+---
+- name: Ping specified host
+  hosts: "{{ target_host }}"
   tasks:
     - name: Ping the target host
       ping:
