@@ -1,4 +1,4 @@
 - hosts:
-    - all
+    - "{{ target_host }}"
   tasks:
     - action: ping
