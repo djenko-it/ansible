@@ -39,7 +39,6 @@
       become: yes
       become_user: "{{ username }}"
       environment:
-        HOME: "{{ user_home }}"
         USER: "{{ username }}"
       register: ohmyzsh_result
       failed_when: "'FAILED' in ohmyzsh_result.stderr"
