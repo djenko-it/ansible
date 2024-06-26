@@ -15,7 +15,9 @@
         shell: /bin/bash
         password: "{{ default_password | password_hash('sha512') }}"
         update_password: on_create
-        password_expire: 1
+
+    - name: Forcer l'utilisateur à changer son mot de passe à la première connexion
+      command: chage -d 0 "{{ username }}"
 
     - name: Ajouter l'utilisateur au groupe sudo (Debian/Ubuntu) ou wheel (RHEL/CentOS) si nécessaire
       when: is_sudoer | bool
