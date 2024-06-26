@@ -20,7 +20,3 @@
           }
         status_code: 204
       delegate_to: localhost
-
-    - name: debug_ping_result
-      debug:
-        var: ping_result
