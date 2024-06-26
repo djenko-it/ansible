@@ -31,8 +31,7 @@
     - name: Installer Oh My Zsh pour l'utilisateur
       become_user: "{{ username }}"
       shell: /bin/bash
-      command: >
-        sh -c "$(curl -fsSL {{ oh_my_zsh_install_url }})" "" --unattended
+      command: sh -c "$(curl -fsSL {{ oh_my_zsh_install_url }})" "" --unattended
 
     - name: Changer le shell de l'utilisateur à Zsh
       command: chsh -s "{{ zsh_path }}" "{{ username }}"
