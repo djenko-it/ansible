@@ -6,13 +6,19 @@
     username: "{{ user }}"
     is_sudoer: "{{ sudoers }}"
     default_password: "{{ password }}"
+    zsh_path: "/bin/zsh"
 
   tasks:
-    - name: Créer l'utilisateur avec un mot de passe par défaut
+    - name: Installer Zsh
+      package:
+        name: zsh
+        state: present
+
+    - name: Créer l'utilisateur avec un mot de passe par défaut et Zsh comme shell
       user:
         name: "{{ username }}"
         state: present
-        shell: /bin/bash
+        shell: "{{ zsh_path }}"
         password: "{{ default_password | password_hash('sha512') }}"
         update_password: on_create
 
