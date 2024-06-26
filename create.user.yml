@@ -1,17 +1,21 @@
 ---
-- name: Playbook pour créer un utilisateur avec des droits sudoers
+- name: Playbook pour créer un utilisateur avec des droits sudoers et un mot de passe par défaut
   hosts: "{{ host }}"
   become: yes
   vars:
     username: "{{ user }}"
     is_sudoer: "{{ sudoers }}"
+    default_password: "{{ password }}"
 
   tasks:
-    - name: Créer l'utilisateur
+    - name: Créer l'utilisateur avec un mot de passe par défaut
       user:
         name: "{{ username }}"
         state: present
         shell: /bin/bash
+        password: "{{ default_password | password_hash('sha512') }}"
+        update_password: on_create
+        password_expire: 1
 
     - name: Ajouter l'utilisateur au groupe sudo (Debian/Ubuntu) ou wheel (RHEL/CentOS) si nécessaire
       when: is_sudoer | bool
