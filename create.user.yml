@@ -20,7 +20,7 @@
       user:
         name: "{{ username }}"
         state: present
-        shell: "{{ zsh_path }}"
+        shell: /bin/bash
         password: "{{ default_password | password_hash('sha512') }}"
         create_home: yes
         update_password: on_create
