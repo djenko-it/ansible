@@ -1,0 +1,16 @@
+---
+- name: Playbook pour supprimer un utilisateur
+  hosts: "{{ host }}"
+  become: yes
+  vars:
+    username: "{{ user }}"
+    remove_home: "{{ remove_home }}"
+    force_remove: "{{ force_remove }}"
+
+  tasks:
+    - name: Supprimer l'utilisateur
+      user:
+        name: "{{ username }}"
+        state: absent
+        remove: "{{ remove_home | bool }}"
+        force: "{{ force_remove | bool }}"
