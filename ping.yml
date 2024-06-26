@@ -1,23 +1,26 @@
 ---
-- name: Ping specified host with webhook notification
+- name: Ping specified host with Discord webhook notification
   hosts: "{{ target_host }}"
   tasks:
     - name: Ping the target host
       ping:
       register: ping_result
-      notify: send_webhook_notification
+      notify: send_discord_notification
 
   handlers:
-    - name: send_webhook_notification
+    - name: send_discord_notification
       uri:
         url: "https://discord.com/api/webhooks/1216141232989016164/E2w3FJESy4faUoXxo9vd9QyKRH702YgcfgONrwvXp43sLpsNd2hqFoXNHmiu0ojzYzFG"
         method: POST
         headers:
           Content-Type: "application/json"
-        body: |
+        body: >
           {
-            "text": "Ping task completed for {{ target_host }} with result: {{ ping_result }}",
-            "status": "{{ ping_result.ping }}"
+            "content": "Ping task completed for {{ target_host }} with result: {{ ping_result.ping }}"
           }
-        status_code: 200
+        status_code: 204
       delegate_to: localhost
+
+    - name: debug_ping_result
+      debug:
+        var: ping_result
