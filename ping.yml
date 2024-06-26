@@ -2,7 +2,7 @@
 - name: Ping specified host with Discord webhook notification
   hosts: "{{ target_host }}"
   tasks:
-    - name: Ping the target host
+    - name: Ping the target host de la mort
       ping:
       register: ping_result
       notify: send_discord_notification
