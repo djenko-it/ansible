@@ -30,19 +30,3 @@
             name: "{{ username }}"
             groups: "{{ 'sudo' if ansible_os_family == 'Debian' else 'wheel' }}"
             append: yes
-
-    - name: S'assurer que le fichier sudoers est configuré correctement
-      when: is_sudoer | bool
-      block:
-        - name: Installer sudo si nécessaire
-          package:
-            name: sudo
-            state: present
-
-        - name: Ajouter l'utilisateur dans sudoers
-          lineinfile:
-            path: /etc/sudoers
-            state: present
-            regexp: '^%{{ username }} ALL='
-            line: '%{{ username }} ALL=(ALL:ALL) ALL'
-            validate: 'visudo -cf %s'
