@@ -2,10 +2,6 @@
 - name: Playbook pour installer un logiciel spécifié par l'utilisateur
   hosts: "{{ host }}"
   become: yes
-  vars_prompt:
-    - name: "software_name"
-      prompt: "Veuillez entrer le nom du logiciel à installer"
-      private: no
 
   tasks:
     - name: Installer le logiciel spécifié
