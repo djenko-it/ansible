@@ -1,0 +1,32 @@
+---
+- name: Playbook pour vérifier les mises à jour disponibles
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Mettre à jour la liste des paquets disponibles (Debian/Ubuntu)
+      command: apt-get update
+      when: ansible_os_family == "Debian"
+      register: apt_update
+
+    - name: Vérifier les mises à jour disponibles (Debian/Ubuntu)
+      command: apt-get upgrade -s
+      when: ansible_os_family == "Debian"
+      register: apt_upgrade
+      changed_when: False
+
+    - name: Afficher les mises à jour disponibles (Debian/Ubuntu)
+      debug:
+        msg: "{{ apt_upgrade.stdout }}"
+      when: ansible_os_family == "Debian"
+
+    - name: Vérifier les mises à jour disponibles (RHEL/CentOS)
+      command: yum check-update
+      when: ansible_os_family == "RedHat"
+      register: yum_check_update
+      changed_when: yum_check_update.rc == 100
+
+    - name: Afficher les mises à jour disponibles (RHEL/CentOS)
+      debug:
+        msg: "{{ yum_check_update.stdout }}"
+      when: ansible_os_family == "RedHat"
