@@ -1,0 +1,17 @@
+---
+- name: Playbook pour lister les utilisateurs
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Obtenir la liste des utilisateurs
+      command: cat /etc/passwd
+      register: passwd_output
+
+    - name: Extraire et afficher la liste des utilisateurs
+      set_fact:
+        users: "{{ passwd_output.stdout_lines | map('split', ':') | map('first') | list }}"
+
+    - name: Afficher la liste des utilisateurs
+      debug:
+        msg: "{{ users }}"
