@@ -1,0 +1,110 @@
+---
+- name: Gestion de GLPI
+  hosts: serveur_glpi
+  become: yes
+  vars:
+    mysql_user: root
+    mysql_password: votremotdepasse # Remplacez par le mot de passe réel
+    database_name: db23_glpi
+    backup_db_path: /home/glpi_adm/backup_db23_glpi.sql
+    backup_glpi_path: /home/glpi_adm/backup_glpi
+    glpi_version: 10.0.12
+    glpi_download_url: "https://github.com/glpi-project/glpi/releases/download/{{ glpi_version }}/glpi-{{ glpi_version }}.tgz"
+
+  tasks:
+    - name: Activer la maintenance
+      ansible.builtin.command:
+        cmd: php bin/console glpi:maintenance:enable
+      args:
+        chdir: /var/www/html/glpi
+
+    - name: Backup de la base de données GLPI
+      ansible.builtin.command:
+        cmd: mysqldump -u {{ mysql_user }} -p{{ mysql_password }} --databases {{ database_name }} > {{ backup_db_path }}
+      ignore_errors: yes # Pour ignorer les erreurs si le mot de passe n'est pas correct ou d'autres erreurs de mysqldump
+
+    - name: Copier le répertoire GLPI
+      ansible.builtin.command:
+        cmd: cp -Rf /var/www/glpi/ {{ backup_glpi_path }}
+      ignore_errors: yes
+
+    - name: Supprimer le contenu du répertoire GLPI
+      ansible.builtin.command:
+        cmd: rm -Rf /var/www/glpi/
+      ignore_errors: yes
+
+    - name: Télécharger GLPI
+      ansible.builtin.get_url:
+        url: "{{ glpi_download_url }}"
+        dest: /tmp/glpi-{{ glpi_version }}.tgz
+
+    - name: Extraire GLPI
+      ansible.builtin.unarchive:
+        src: /tmp/glpi-{{ glpi_version }}.tgz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Déplacer GLPI vers /var/www/glpi
+      ansible.builtin.command:
+        cmd: mv /tmp/glpi /var/www/glpi
+      ignore_errors: yes
+
+    - name: Copier les fichiers de sauvegarde vers le nouveau GLPI - files
+      ansible.builtin.command:
+        cmd: cp -Rf {{ backup_glpi_path }}/files /var/www/glpi/
+      ignore_errors: yes
+
+    - name: Copier les fichiers de sauvegarde vers le nouveau GLPI - plugins
+      ansible.builtin.command:
+        cmd: cp -Rf {{ backup_glpi_path }}/plugins /var/www/glpi/
+      ignore_errors: yes
+
+    - name: Copier les fichiers de sauvegarde vers le nouveau GLPI - config
+      ansible.builtin.command:
+        cmd: cp -Rf {{ backup_glpi_path }}/config /var/www/glpi/
+      ignore_errors: yes
+
+    - name: Copier les fichiers de sauvegarde vers le nouveau GLPI - marketplace
+      ansible.builtin.command:
+        cmd: cp -Rf {{ backup_glpi_path }}/marketplace /var/www/glpi/
+      ignore_errors: yes
+
+    - name: Donner les droits à www-data sur /var/www/glpi
+      ansible.builtin.command:
+        cmd: chown -R www-data:www-data /var/www/glpi
+      ignore_errors: yes
+
+    - name: Vérifier les exigences système de GLPI
+      ansible.builtin.shell: |
+        cd /var/www/glpi
+        php bin/console glpi:system:check_requirements
+      register: glpi_requirements_check
+
+    - name: Afficher le résultat de la vérification des exigences système
+      ansible.builtin.debug:
+        var: glpi_requirements_check.stdout
+
+    - name: Mettre à jour la base de données GLPI
+      ansible.builtin.shell: |
+        cd /var/www/glpi
+        php bin/console db:update
+      register: glpi_db_update
+
+    - name: Afficher le résultat de la mise à jour de la base de données
+      ansible.builtin.debug:
+        var: glpi_db_update.stdout
+
+    - name: Supprimer le fichier install.php
+      ansible.builtin.command:
+        cmd: rm /var/www/glpi/install/install.php
+      ignore_errors: yes
+
+    - name: Désactiver la maintenance
+      ansible.builtin.shell: |
+        cd /var/www/glpi
+        php bin/console glpi:maintenance:disable
+      register: glpi_maintenance_disable
+
+    - name: Afficher le résultat de la désactivation de la maintenance
+      ansible.builtin.debug:
+        var: glpi_maintenance_disable.stdout
