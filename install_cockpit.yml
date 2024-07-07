@@ -1,0 +1,22 @@
+---
+- name: Configure Debian Backports and Install Cockpit
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Load OS release info
+      shell: . /etc/os-release
+      register: os_release
+
+    - name: Add backports repository to sources list
+      shell: echo "deb http://deb.debian.org/debian {{ os_release.stdout_lines[0].split('=')[1] }}-backports main" > /etc/apt/sources.list.d/backports.list
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install or update Cockpit from backports
+      apt:
+        name: cockpit
+        target_release: "{{ os_release.stdout_lines[0].split('=')[1] }}-backports"
+        state: present
