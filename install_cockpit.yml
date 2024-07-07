@@ -22,5 +22,5 @@
     - name: Install or update Cockpit from backports
       apt:
         name: cockpit
-        target_release: "{{ version_codename }}-backports"
+        default_release: "{{ version_codename }}-backports"
         state: present
