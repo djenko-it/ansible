@@ -4,12 +4,16 @@
   become: yes
 
   tasks:
-    - name: Load OS release info
-      shell: . /etc/os-release
+    - name: Read OS release info
+      command: cat /etc/os-release
       register: os_release
 
+    - name: Extract VERSION_CODENAME
+      set_fact:
+        version_codename: "{{ os_release.stdout | regex_search('VERSION_CODENAME=(\\w+)') | regex_replace('VERSION_CODENAME=', '') }}"
+
     - name: Add backports repository to sources list
-      shell: echo "deb http://deb.debian.org/debian {{ os_release.stdout_lines[0].split('=')[1] }}-backports main" > /etc/apt/sources.list.d/backports.list
+      shell: echo "deb http://deb.debian.org/debian {{ version_codename }}-backports main" > /etc/apt/sources.list.d/backports.list
 
     - name: Update apt cache
       apt:
@@ -18,5 +22,5 @@
     - name: Install or update Cockpit from backports
       apt:
         name: cockpit
-        target_release: "{{ os_release.stdout_lines[0].split('=')[1] }}-backports"
+        target_release: "{{ version_codename }}-backports"
         state: present
