@@ -1,0 +1,27 @@
+---
+- name: Install Restic and setup backup directory
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install restic
+      apt:
+        name: restic
+        state: present
+
+    - name: Create backup directory
+      file:
+        path: /data/backups
+        state: directory
+        owner: your_user
+        group: your_group
+        mode: '0755'
+
+    - name: Initialize restic repository
+      command: restic init --repo /data/backups
+      environment:
+        RESTIC_PASSWORD: "your_secure_password"
