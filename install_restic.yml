@@ -17,8 +17,8 @@
       file:
         path: /data/backups
         state: directory
-        owner: your_user
-        group: your_group
+        owner: root
+        group: root
         mode: '0755'
 
     - name: Initialize restic repository
