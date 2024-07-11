@@ -10,6 +10,6 @@
         state: present
 
     - name: Perform Restic backup
-      command: restic -r /data/backups backup /home/{{ ansible_user }}/data/loki
+      command: restic -r /data/backups backup /data/loki
       environment:
         RESTIC_PASSWORD: "your_secure_password"
