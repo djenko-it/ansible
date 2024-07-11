@@ -1,0 +1,23 @@
+---
+- name: Manage Restic backups and retention
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Ensure restic is installed
+      apt:
+        name: restic
+        state: present
+
+    - name: Define restic forget policy
+      command: >
+        restic -r /data/backups forget
+        --keep-last 1
+        --keep-hourly 24
+        --keep-daily 7
+        --keep-weekly 4
+        --keep-monthly 12
+        --keep-yearly 3
+        --prune
+      environment:
+        RESTIC_PASSWORD: "your_secure_password"
