@@ -1,0 +1,15 @@
+---
+- name: Perform backup using Restic
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Ensure restic is installed
+      apt:
+        name: restic
+        state: present
+
+    - name: Perform Restic backup
+      command: restic -r /data/backups backup /home/{{ ansible_user }}/data/loki
+      environment:
+        RESTIC_PASSWORD: "your_secure_password"
