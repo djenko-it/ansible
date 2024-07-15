@@ -15,6 +15,7 @@
         RESTIC_PASSWORD: "your_secure_password"
       register: restic_snapshots_output
 
-    - name: Display Restic snapshots
+    - name: Format and display Restic snapshots
       debug:
-        msg: "{{ restic_snapshots_output.stdout }}"
+        msg: |
+          {{ restic_snapshots_output.stdout.split('\n') | map('trim') | join('\n') }}
