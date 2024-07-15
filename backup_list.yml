@@ -1,0 +1,20 @@
+---
+- name: List Restic backups
+  hosts: "{{ host }}"
+  become: yes
+
+  tasks:
+    - name: Ensure restic is installed
+      apt:
+        name: restic
+        state: present
+
+    - name: List Restic snapshots
+      command: restic -r /data/backups snapshots
+      environment:
+        RESTIC_PASSWORD: "your_secure_password"
+      register: restic_snapshots_output
+
+    - name: Display Restic snapshots
+      debug:
+        msg: "{{ restic_snapshots_output.stdout }}"
