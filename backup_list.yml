@@ -17,5 +17,9 @@
 
     - name: Format and display Restic snapshots
       debug:
-        msg: |
-          {{ restic_snapshots_output.stdout.split('\n') | map('trim') | join('\n') }}
+        msg: >
+          {% set output_lines = restic_snapshots_output.stdout.split('\n') %}
+          Snapshots:
+          {% for line in output_lines %}
+          {{ line }}
+          {% endfor %}
