@@ -2,6 +2,13 @@
 - name: Perform backup using Restic
   hosts: "{{ host }}"
   become: yes
+  vars:
+    restic_version: "0.12.1"
+    backup_dirs:
+      - "/data/npm"
+      - "/data/dns"
+    backup_destination: "/data/backups"
+    restic_password: "{{ restic_mdp }}"
 
   tasks:
     - name: Ensure restic is installed
@@ -9,7 +16,15 @@
         name: restic
         state: present
 
-    - name: Perform Restic backup
-      command: restic -r /data/backups backup /data/loki
+    - name: Créer le répertoire de destination pour les sauvegardes
+      file:
+        path: "{{ backup_destination }}"
+        state: directory
+        mode: '0755'
+
+    - name: Effectuer une sauvegarde avec Restic
+      command: >
+        restic -r {{ backup_destination }} backup {{ item }}
+      with_items: "{{ backup_dirs }}"
       environment:
-        RESTIC_PASSWORD: "your_secure_password"
+        RESTIC_PASSWORD: "{{ restic_password }}"
