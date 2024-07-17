@@ -21,6 +21,11 @@
         path: "{{ backup_destination }}"
         state: directory
         mode: '0755'
+        
+    - name: Initialize restic repository
+      command: restic init --repo "{{ backup_destination }}"
+      environment:
+        RESTIC_PASSWORD: "{{ restic_password }}"
 
     - name: Effectuer une sauvegarde avec Restic
       command: >
