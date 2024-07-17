@@ -8,9 +8,9 @@
       - "/data/npm"
       - "/data/dns"
     restic_password: "{{ restic_mdp }}"
-    s3_endpoint: "{{ s3_endpoint }}"
-    s3_access_key: "{{ s3_access_key }}"
-    s3_secret_key: "{{ s3_secret_key }}"
+    s3_endpoint: "{{ s3_endpoint_var }}"
+    s3_access_key: "{{ s3_access_key_var }}"
+    s3_secret_key: "{{ s3_secret_key_var }}"
 
   tasks:
     - name: Ensure restic is installed
