@@ -17,12 +17,6 @@
       apt:
         name: restic
         state: present
-
-    - name: Créer le répertoire de destination pour les sauvegardes
-      file:
-        path: "{{ backup_destination }}"
-        state: directory
-        mode: '0755'
         
     - name: Initialize restic repository
       command: >
